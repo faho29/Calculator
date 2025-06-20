@@ -51,6 +51,8 @@ public class CalculatorUI {
     private JButton btnRoot;
     private JButton btnPower;
     private JButton btnLog;
+    private JButton btnSquare;
+    private JButton btnReciprocal;
     private JLabel expressionLabel;
     private String currentExpression = "";
 
@@ -147,12 +149,16 @@ public class CalculatorUI {
                     btnRoot.setVisible(false);
                     btnPower.setVisible(false);
                     btnLog.setVisible(false);
+                    btnSquare.setVisible(false);
+                    btnReciprocal.setVisible(false);
                     break;
                 case "Scientific":
                     window.setSize(WINDOW_WIDTH + 80, WINDOW_HEIGHT);
                     btnRoot.setVisible(true);
                     btnPower.setVisible(true);
                     btnLog.setVisible(true);
+                    btnSquare.setVisible(true);
+                    btnReciprocal.setVisible(true);
                     break;
             }
         });
@@ -561,6 +567,44 @@ public class CalculatorUI {
             updateExpressionLabel("");
         });
         btnLog.setVisible(false);
+
+        btnSquare = createButton("x²", columns[4], rows[4]);
+        btnSquare.addActionListener(event -> {
+            if (!Pattern.matches(DOUBLE_OR_NUMBER_REGEX, inputScreen.getText()))
+                return;
+            double value = Double.parseDouble(inputScreen.getText());
+            double result = value * value;
+            if (Pattern.matches("[-]?[\\d]+[.][0]*", String.valueOf(result))) {
+                inputScreen.setText(String.valueOf((int) result));
+            } else {
+                inputScreen.setText(String.valueOf(result));
+            }
+            addToDisplay = false;
+            selectedOperator = '=';
+        });
+        btnSquare.setVisible(false);
+
+        btnReciprocal = createButton("1/x", columns[4], rows[5]);
+        btnReciprocal.addActionListener(event -> {
+            if (!Pattern.matches(DOUBLE_OR_NUMBER_REGEX, inputScreen.getText()))
+                return;
+            double value = Double.parseDouble(inputScreen.getText());
+            if (value == 0) {
+                inputScreen.setText("Error");
+                addToDisplay = false;
+                selectedOperator = '=';
+                return;
+            }
+            double result = 1.0 / value;
+            if (Pattern.matches("[-]?[\\d]+[.][0]*", String.valueOf(result))) {
+                inputScreen.setText(String.valueOf((int) result));
+            } else {
+                inputScreen.setText(String.valueOf(result));
+            }
+            addToDisplay = false;
+            selectedOperator = '=';
+        });
+        btnReciprocal.setVisible(false);
     }
 
     private JComboBox<String> createComboBox(String[] items, int x, int y, String toolTip) {
@@ -612,6 +656,8 @@ public class CalculatorUI {
         btnLog.setForeground(hex2Color(theme.getTextColor()));
         btnPower.setForeground(hex2Color(theme.getTextColor()));
         btnEqual.setForeground(hex2Color(theme.getBtnEqualTextColor()));
+        btnSquare.setForeground(hex2Color(theme.getTextColor()));
+        btnReciprocal.setForeground(hex2Color(theme.getTextColor()));
 
         comboCalculatorType.setBackground(hex2Color(theme.getApplicationBackground()));
         comboTheme.setBackground(hex2Color(theme.getApplicationBackground()));
@@ -638,6 +684,8 @@ public class CalculatorUI {
         btnLog.setBackground(hex2Color(theme.getOperatorBackground()));
         btnPower.setBackground(hex2Color(theme.getOperatorBackground()));
         btnEqual.setBackground(hex2Color(theme.getBtnEqualBackground()));
+        btnSquare.setBackground(hex2Color(theme.getOperatorBackground()));
+        btnReciprocal.setBackground(hex2Color(theme.getOperatorBackground()));
     }
 
     private void updateExpressionLabel(String newText) {
