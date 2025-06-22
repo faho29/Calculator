@@ -11,6 +11,15 @@ import java.util.Map;
 import java.util.regex.Pattern;
 import java.awt.Color;
 import javax.swing.*;
+import javax.swing.text.JTextComponent;
+import javax.swing.KeyStroke;
+import javax.swing.AbstractAction;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.Toolkit;
+import java.io.IOException;
+import java.awt.datatransfer.UnsupportedFlavorException;
 
 import static com.houarizegai.calculator.util.ColorUtil.hex2Color;
 
@@ -122,6 +131,70 @@ public class CalculatorUI {
         inputScreen.setEditable(false);
         inputScreen.setBackground(Color.WHITE);
         inputScreen.setFont(new Font(FONT_NAME, Font.PLAIN, 33));
+        
+        JPopupMenu popupMenu = new JPopupMenu();
+        JMenuItem copyItem = new JMenuItem("Kopyala");
+        JMenuItem pasteItem = new JMenuItem("Yapıştır");
+        popupMenu.add(copyItem);
+        popupMenu.add(pasteItem);
+
+        copyItem.addActionListener(e -> {
+            String text = inputScreen.getText();
+            if (!text.isEmpty()) {
+                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+                StringSelection selection = new StringSelection(text);
+                clipboard.setContents(selection, null);
+            }
+        });
+        pasteItem.addActionListener(e -> {
+            Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+            try {
+                String data = (String) clipboard.getData(DataFlavor.stringFlavor);
+                if (data != null && !data.isEmpty()) {
+                    String current = inputScreen.getText();
+                    if ("0".equals(current)) {
+                        inputScreen.setText(data);
+                    } else {
+                        inputScreen.setText(current + data);
+                    }
+                }
+            } catch (UnsupportedFlavorException | IOException ex) {
+            }
+        });
+        inputScreen.setComponentPopupMenu(popupMenu);
+
+        inputScreen.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke("control C"), "copy");
+        inputScreen.getActionMap().put("copy", new AbstractAction() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                String text = inputScreen.getText();
+                if (!text.isEmpty()) {
+                    Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+                    StringSelection selection = new StringSelection(text);
+                    clipboard.setContents(selection, null);
+                }
+            }
+        });
+        inputScreen.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke("control V"), "paste");
+        inputScreen.getActionMap().put("paste", new AbstractAction() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+                try {
+                    String data = (String) clipboard.getData(DataFlavor.stringFlavor);
+                    if (data != null && !data.isEmpty()) {
+                        String current = inputScreen.getText();
+                        if ("0".equals(current)) {
+                            inputScreen.setText(data);
+                        } else {
+                            inputScreen.setText(current + data);
+                        }
+                    }
+                } catch (UnsupportedFlavorException | IOException ex) {
+                }
+            }
+        });
+
         window.add(inputScreen);
     }
 
