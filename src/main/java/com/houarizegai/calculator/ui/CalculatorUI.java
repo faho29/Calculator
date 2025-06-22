@@ -379,10 +379,12 @@ public class CalculatorUI {
             addToDisplay = true;
         });
 
-        btnPoint = createButton(".", columns[2], rows[5]);
+        btnPoint = createButton(".", columns[0], rows[5]);
         btnPoint.addActionListener(event -> {
             if (addToDisplay) {
-                if (!inputScreen.getText().contains(".")) {
+                if (inputScreen.getText().equals("0")) {
+                    inputScreen.setText("0.");
+                } else {
                     inputScreen.setText(inputScreen.getText() + ".");
                 }
             } else {
@@ -393,7 +395,7 @@ public class CalculatorUI {
             updateExpressionLabel(currentExpression);
         });
 
-        btn0 = createButton("0", columns[0], rows[5], 2);
+        btn0 = createButton("0", columns[1], rows[5]);
         btn0.addActionListener(event -> {
             if (addToDisplay) {
                 if (Pattern.matches("[0]*", inputScreen.getText())) {
@@ -409,7 +411,7 @@ public class CalculatorUI {
             updateExpressionLabel(currentExpression);
         });
 
-        btnEqual = createButton("=", columns[3], rows[5]);
+        btnEqual = createButton("=", columns[2], rows[5]);
         btnEqual.addActionListener(event -> {
             try {
                 String expression = inputScreen.getText();
@@ -424,6 +426,7 @@ public class CalculatorUI {
                 currentExpression = "";
                 addToDisplay = false;
             }
+            btnEqual.setSize(2 * BUTTON_WIDTH + 10, BUTTON_HEIGHT);
         });
         btnEqual.setSize(2 * BUTTON_WIDTH + 10, BUTTON_HEIGHT);
 
