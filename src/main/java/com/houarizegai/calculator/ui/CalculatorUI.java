@@ -51,6 +51,10 @@ public class CalculatorUI {
     private JButton btnRoot;
     private JButton btnPower;
     private JButton btnLog;
+    private JButton btnSquare;
+    private JButton btnReciprocal;
+    private JLabel expressionLabel;
+    private String currentExpression = "";
 
     private char selectedOperator = ' ';
     private boolean go = true; // For calculate with Opt != (=)
@@ -69,11 +73,11 @@ public class CalculatorUI {
         int[] columns = {MARGIN_X, MARGIN_X + 90, MARGIN_X + 90 * 2, MARGIN_X + 90 * 3, MARGIN_X + 90 * 4};
         int[] rows = {MARGIN_Y, MARGIN_Y + 100, MARGIN_Y + 100 + 80, MARGIN_Y + 100 + 80 * 2, MARGIN_Y + 100 + 80 * 3, MARGIN_Y + 100 + 80 * 4};
 
-        initInputScreen(columns, rows);
+        initCalculatorTypeSelectorTop(20, 10);
+        initExpressionLabelTop(MARGIN_X, 45);
+        initInputScreen(columns, new int[]{80, rows[1], rows[2], rows[3], rows[4], rows[5]});
         initButtons(columns, rows);
-        initCalculatorTypeSelector();
-
-        initThemeSelector();
+        initThemeSelectorTop(230, 10);
 
         window.setLayout(null);
         window.setResizable(false);
@@ -100,16 +104,15 @@ public class CalculatorUI {
         }
     }
 
-    private void initThemeSelector() {
-        comboTheme = createComboBox(themesMap.keySet().toArray(new String[0]), 230, 30, "Theme");
+    private void initThemeSelectorTop(int x, int y) {
+        comboTheme = createComboBox(themesMap.keySet().toArray(new String[0]), x, y, "Theme");
+        comboTheme.setBounds(x, y, 140, 25);
         comboTheme.addItemListener(event -> {
             if (event.getStateChange() != ItemEvent.SELECTED)
                 return;
-
             String selectedTheme = (String) event.getItem();
             applyTheme(themesMap.get(selectedTheme));
         });
-
         if (themesMap.entrySet().iterator().hasNext()) {
             applyTheme(themesMap.entrySet().iterator().next().getValue());
         }
@@ -124,12 +127,21 @@ public class CalculatorUI {
         window.add(inputScreen);
     }
 
-    private void initCalculatorTypeSelector() {
-        comboCalculatorType = createComboBox(new String[]{"Standard", "Scientific"}, 20, 30, "Calculator type");
+    private void initExpressionLabelTop(int x, int y) {
+        expressionLabel = new JLabel("");
+        expressionLabel.setBounds(x, y, 350, 30);
+        expressionLabel.setFont(new Font(FONT_NAME, Font.PLAIN, 20));
+        expressionLabel.setForeground(Color.GRAY);
+        expressionLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+        window.add(expressionLabel);
+    }
+
+    private void initCalculatorTypeSelectorTop(int x, int y) {
+        comboCalculatorType = createComboBox(new String[]{"Standard", "Scientific"}, x, y, "Calculator type");
+        comboCalculatorType.setBounds(x, y, 140, 25);
         comboCalculatorType.addItemListener(event -> {
             if (event.getStateChange() != ItemEvent.SELECTED)
                 return;
-
             String selectedItem = (String) event.getItem();
             switch (selectedItem) {
                 case "Standard":
@@ -137,12 +149,16 @@ public class CalculatorUI {
                     btnRoot.setVisible(false);
                     btnPower.setVisible(false);
                     btnLog.setVisible(false);
+                    btnSquare.setVisible(false);
+                    btnReciprocal.setVisible(false);
                     break;
                 case "Scientific":
                     window.setSize(WINDOW_WIDTH + 80, WINDOW_HEIGHT);
                     btnRoot.setVisible(true);
                     btnPower.setVisible(true);
                     btnLog.setVisible(true);
+                    btnSquare.setVisible(true);
+                    btnReciprocal.setVisible(true);
                     break;
             }
         });
@@ -154,6 +170,8 @@ public class CalculatorUI {
             inputScreen.setText("0");
             selectedOperator = ' ';
             typedValue = 0;
+            currentExpression = "";
+            updateExpressionLabel("");
         });
 
         btnBack = createButton("<-", columns[1], rows[1]);
@@ -168,6 +186,10 @@ public class CalculatorUI {
             } else {
                 inputScreen.setText(str2.toString());
             }
+            if (!currentExpression.isEmpty()) {
+                currentExpression = currentExpression.substring(0, currentExpression.length() - 1);
+            }
+            updateExpressionLabel(currentExpression);
         });
 
         btnMod = createButton("%", columns[2], rows[1]);
@@ -184,6 +206,8 @@ public class CalculatorUI {
             selectedOperator = '%';
             go = false;
             addToDisplay = false;
+            currentExpression += "%";
+            updateExpressionLabel(currentExpression);
         });
 
         btnDiv = createButton("/", columns[3], rows[1]);
@@ -204,6 +228,8 @@ public class CalculatorUI {
             } else {
                 selectedOperator = '/';
             }
+            currentExpression += "/";
+            updateExpressionLabel(currentExpression);
         });
 
         btn7 = createButton("7", columns[0], rows[2]);
@@ -219,6 +245,8 @@ public class CalculatorUI {
                 addToDisplay = true;
             }
             go = true;
+            currentExpression += "7";
+            updateExpressionLabel(currentExpression);
         });
 
         btn8 = createButton("8", columns[1], rows[2]);
@@ -234,6 +262,8 @@ public class CalculatorUI {
                 addToDisplay = true;
             }
             go = true;
+            currentExpression += "8";
+            updateExpressionLabel(currentExpression);
         });
 
         btn9 = createButton("9", columns[2], rows[2]);
@@ -249,6 +279,8 @@ public class CalculatorUI {
                 addToDisplay = true;
             }
             go = true;
+            currentExpression += "9";
+            updateExpressionLabel(currentExpression);
         });
 
         btnMul = createButton("*", columns[3], rows[2]);
@@ -269,6 +301,8 @@ public class CalculatorUI {
             } else {
                 selectedOperator = '*';
             }
+            currentExpression += "*";
+            updateExpressionLabel(currentExpression);
         });
 
         btn4 = createButton("4", columns[0], rows[3]);
@@ -284,6 +318,8 @@ public class CalculatorUI {
                 addToDisplay = true;
             }
             go = true;
+            currentExpression += "4";
+            updateExpressionLabel(currentExpression);
         });
 
         btn5 = createButton("5", columns[1], rows[3]);
@@ -299,6 +335,8 @@ public class CalculatorUI {
                 addToDisplay = true;
             }
             go = true;
+            currentExpression += "5";
+            updateExpressionLabel(currentExpression);
         });
 
         btn6 = createButton("6", columns[2], rows[3]);
@@ -314,10 +352,24 @@ public class CalculatorUI {
                 addToDisplay = true;
             }
             go = true;
+            currentExpression += "6";
+            updateExpressionLabel(currentExpression);
         });
 
         btnSub = createButton("-", columns[3], rows[3]);
         btnSub.addActionListener(event -> {
+            if ((inputScreen.getText().equals("0") || inputScreen.getText().isEmpty()) && addToDisplay) {
+                inputScreen.setText("-");
+                if (currentExpression.isEmpty() || currentExpression.endsWith("+") || currentExpression.endsWith("-") || currentExpression.endsWith("*") || currentExpression.endsWith("/") || currentExpression.endsWith("%") || currentExpression.endsWith("^")) {
+                    currentExpression += "-";
+                } else {
+                    currentExpression = "-";
+                }
+                updateExpressionLabel(currentExpression);
+                addToDisplay = true;
+                go = true;
+                return;
+            }
             if (!Pattern.matches(DOUBLE_OR_NUMBER_REGEX, inputScreen.getText()))
                 return;
 
@@ -335,6 +387,8 @@ public class CalculatorUI {
             } else {
                 selectedOperator = '-';
             }
+            currentExpression += "-";
+            updateExpressionLabel(currentExpression);
         });
 
         btn1 = createButton("1", columns[0], rows[4]);
@@ -350,6 +404,8 @@ public class CalculatorUI {
                 addToDisplay = true;
             }
             go = true;
+            currentExpression += "1";
+            updateExpressionLabel(currentExpression);
         });
 
         btn2 = createButton("2", columns[1], rows[4]);
@@ -365,6 +421,8 @@ public class CalculatorUI {
                 addToDisplay = true;
             }
             go = true;
+            currentExpression += "2";
+            updateExpressionLabel(currentExpression);
         });
 
         btn3 = createButton("3", columns[2], rows[4]);
@@ -380,6 +438,8 @@ public class CalculatorUI {
                 addToDisplay = true;
             }
             go = true;
+            currentExpression += "3";
+            updateExpressionLabel(currentExpression);
         });
 
         btnAdd = createButton("+", columns[3], rows[4]);
@@ -400,6 +460,8 @@ public class CalculatorUI {
             } else {
                 selectedOperator = '+';
             }
+            currentExpression += "+";
+            updateExpressionLabel(currentExpression);
         });
 
         btnPoint = createButton(".", columns[0], rows[5]);
@@ -413,6 +475,8 @@ public class CalculatorUI {
                 addToDisplay = true;
             }
             go = true;
+            currentExpression += ".";
+            updateExpressionLabel(currentExpression);
         });
 
         btn0 = createButton("0", columns[1], rows[5]);
@@ -428,6 +492,8 @@ public class CalculatorUI {
                 addToDisplay = true;
             }
             go = true;
+            currentExpression += "0";
+            updateExpressionLabel(currentExpression);
         });
 
         btnEqual = createButton("=", columns[2], rows[5]);
@@ -445,6 +511,8 @@ public class CalculatorUI {
                 selectedOperator = '=';
                 addToDisplay = false;
             }
+            currentExpression = "";
+            updateExpressionLabel("");
         });
         btnEqual.setSize(2 * BUTTON_WIDTH + 10, BUTTON_HEIGHT);
 
@@ -463,6 +531,8 @@ public class CalculatorUI {
                 selectedOperator = '√';
                 addToDisplay = false;
             }
+            currentExpression = "";
+            updateExpressionLabel("");
         });
         btnRoot.setVisible(false);
 
@@ -484,6 +554,8 @@ public class CalculatorUI {
             } else {
                 selectedOperator = '^';
             }
+            currentExpression = "";
+            updateExpressionLabel("");
         });
         btnPower.setFont(new Font("Comic Sans MS", Font.PLAIN, 24));
         btnPower.setVisible(false);
@@ -503,8 +575,48 @@ public class CalculatorUI {
                 selectedOperator = 'l';
                 addToDisplay = false;
             }
+            currentExpression = "";
+            updateExpressionLabel("");
         });
         btnLog.setVisible(false);
+
+        btnSquare = createButton("x²", columns[4], rows[4]);
+        btnSquare.addActionListener(event -> {
+            if (!Pattern.matches(DOUBLE_OR_NUMBER_REGEX, inputScreen.getText()))
+                return;
+            double value = Double.parseDouble(inputScreen.getText());
+            double result = value * value;
+            if (Pattern.matches("[-]?[\\d]+[.][0]*", String.valueOf(result))) {
+                inputScreen.setText(String.valueOf((int) result));
+            } else {
+                inputScreen.setText(String.valueOf(result));
+            }
+            addToDisplay = false;
+            selectedOperator = '=';
+        });
+        btnSquare.setVisible(false);
+
+        btnReciprocal = createButton("1/x", columns[4], rows[5]);
+        btnReciprocal.addActionListener(event -> {
+            if (!Pattern.matches(DOUBLE_OR_NUMBER_REGEX, inputScreen.getText()))
+                return;
+            double value = Double.parseDouble(inputScreen.getText());
+            if (value == 0) {
+                inputScreen.setText("Error");
+                addToDisplay = false;
+                selectedOperator = '=';
+                return;
+            }
+            double result = 1.0 / value;
+            if (Pattern.matches("[-]?[\\d]+[.][0]*", String.valueOf(result))) {
+                inputScreen.setText(String.valueOf((int) result));
+            } else {
+                inputScreen.setText(String.valueOf(result));
+            }
+            addToDisplay = false;
+            selectedOperator = '=';
+        });
+        btnReciprocal.setVisible(false);
     }
 
     private JComboBox<String> createComboBox(String[] items, int x, int y, String toolTip) {
@@ -556,6 +668,8 @@ public class CalculatorUI {
         btnLog.setForeground(hex2Color(theme.getTextColor()));
         btnPower.setForeground(hex2Color(theme.getTextColor()));
         btnEqual.setForeground(hex2Color(theme.getBtnEqualTextColor()));
+        btnSquare.setForeground(hex2Color(theme.getTextColor()));
+        btnReciprocal.setForeground(hex2Color(theme.getTextColor()));
 
         comboCalculatorType.setBackground(hex2Color(theme.getApplicationBackground()));
         comboTheme.setBackground(hex2Color(theme.getApplicationBackground()));
@@ -582,5 +696,11 @@ public class CalculatorUI {
         btnLog.setBackground(hex2Color(theme.getOperatorBackground()));
         btnPower.setBackground(hex2Color(theme.getOperatorBackground()));
         btnEqual.setBackground(hex2Color(theme.getBtnEqualBackground()));
+        btnSquare.setBackground(hex2Color(theme.getOperatorBackground()));
+        btnReciprocal.setBackground(hex2Color(theme.getOperatorBackground()));
+    }
+
+    private void updateExpressionLabel(String newText) {
+        expressionLabel.setText(newText);
     }
 }
