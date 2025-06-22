@@ -358,6 +358,18 @@ public class CalculatorUI {
 
         btnSub = createButton("-", columns[3], rows[3]);
         btnSub.addActionListener(event -> {
+            if ((inputScreen.getText().equals("0") || inputScreen.getText().isEmpty()) && addToDisplay) {
+                inputScreen.setText("-");
+                if (currentExpression.isEmpty() || currentExpression.endsWith("+") || currentExpression.endsWith("-") || currentExpression.endsWith("*") || currentExpression.endsWith("/") || currentExpression.endsWith("%") || currentExpression.endsWith("^")) {
+                    currentExpression += "-";
+                } else {
+                    currentExpression = "-";
+                }
+                updateExpressionLabel(currentExpression);
+                addToDisplay = true;
+                go = true;
+                return;
+            }
             if (!Pattern.matches(DOUBLE_OR_NUMBER_REGEX, inputScreen.getText()))
                 return;
 
