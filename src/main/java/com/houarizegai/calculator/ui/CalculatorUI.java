@@ -388,6 +388,21 @@ public class CalculatorUI {
 
         btnSub = createButton("-", columns[3], rows[3]);
         btnSub.addActionListener(event -> {
+            String text = inputScreen.getText();
+            if ((text.equals("0") || text.isEmpty()) && addToDisplay) {
+                inputScreen.setText("-");
+                currentExpression = "-";
+                updateExpressionLabel(currentExpression);
+                addToDisplay = true;
+                return;
+            }
+            if ((text.endsWith("+") || text.endsWith("-") || text.endsWith("*") || text.endsWith("/") || text.endsWith("%") || text.endsWith("^")) && addToDisplay) {
+                inputScreen.setText(text + "-");
+                currentExpression += "-";
+                updateExpressionLabel(currentExpression);
+                addToDisplay = true;
+                return;
+            }
             if (inputScreen.getText().endsWith("-")) return;
             inputScreen.setText(inputScreen.getText() + "-");
             currentExpression += "-";
